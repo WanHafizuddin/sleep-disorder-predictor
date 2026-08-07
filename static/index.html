@@ -1,5 +1,140 @@
 <!DOCTYPE html>
-<html>
-<head><title>Sleep Disorder Predictor</title></head>
-<body><p>placeholder</p></body>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleep Disorder Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="header-row">
+    <div>
+      <h1>Sleep Disorder Predictor</h1>
+      <p class="subtitle">Fill in your health and lifestyle details, and we'll estimate your sleep disorder risk.</p>
+    </div>
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+  </div>
+
+  <hr class="hr">
+
+  <section id="form-screen">
+    <div class="form-grid">
+      <div class="form-col">
+
+        <div class="field-block">
+          <label>Gender</label>
+          <div class="seg" id="gender-seg">
+            <button type="button" class="seg-opt active" data-value="Male">Male</button>
+            <button type="button" class="seg-opt" data-value="Female">Female</button>
+          </div>
+        </div>
+
+        <div class="field-block">
+          <label class="label-row"><span>Age</span><span id="age-value">30</span></label>
+          <input type="range" id="age" min="18" max="80" value="30">
+        </div>
+
+        <div class="field-block">
+          <label class="label-row"><span>Sleep Duration (hours)</span><span id="sleep-duration-value">7.0</span></label>
+          <input type="range" id="sleep-duration" min="4" max="10" step="0.1" value="7.0">
+        </div>
+
+        <div class="field-block">
+          <label class="label-row"><span>Quality of Sleep (1-10)</span><span id="quality-of-sleep-value">7</span></label>
+          <input type="range" id="quality-of-sleep" min="1" max="10" value="7">
+        </div>
+
+        <div class="field-block">
+          <label class="label-row"><span>Physical Activity (min/day)</span><span id="physical-activity-value">45</span></label>
+          <input type="range" id="physical-activity" min="0" max="120" value="45">
+        </div>
+
+        <div class="field-block">
+          <label class="label-row"><span>Stress Level (1-10)</span><span id="stress-level-value">5</span></label>
+          <input type="range" id="stress-level" min="1" max="10" value="5">
+        </div>
+
+      </div>
+
+      <div class="form-col">
+
+        <div class="field-block">
+          <label>BMI Category</label>
+          <div class="seg" id="bmi-seg">
+            <button type="button" class="seg-opt" data-value="Underweight">Underweight</button>
+            <button type="button" class="seg-opt active" data-value="Normal">Normal</button>
+            <button type="button" class="seg-opt" data-value="Overweight">Overweight</button>
+            <button type="button" class="seg-opt" data-value="Obese">Obese</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Heart Rate (bpm)</label>
+          <input class="input" type="number" id="heart-rate" min="40" max="120" value="72">
+        </div>
+
+        <div class="field">
+          <label>Daily Steps</label>
+          <input class="input" type="number" id="daily-steps" min="0" max="20000" step="500" value="7000">
+        </div>
+
+        <div class="field">
+          <label>Blood Pressure &mdash; Systolic</label>
+          <input class="input" type="number" id="bp-systolic" min="80" max="200" value="120">
+        </div>
+
+        <div class="field">
+          <label>Blood Pressure &mdash; Diastolic</label>
+          <input class="input" type="number" id="bp-diastolic" min="50" max="130" value="80">
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="hr hr-loose">
+
+    <button type="button" class="btn btn-primary btn-block" id="predict-btn">
+      <span>Predict Sleep Disorder</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+    </button>
+  </section>
+
+  <section id="loading-screen" class="hidden">
+    <svg class="spinner" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2"><rect x="4" y="4" width="16" height="16"></rect></svg>
+    <p class="loading-text">Analyzing your sleep data&hellip;</p>
+  </section>
+
+  <section id="result-screen" class="hidden">
+    <p class="eyebrow">Result</p>
+    <div class="result-header">
+      <svg id="result-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2"></svg>
+      <h2 id="result-title"></h2>
+      <span class="tag" id="result-tag"></span>
+    </div>
+    <p class="result-message" id="result-message"></p>
+
+    <div id="suggestions-block" class="hidden">
+      <p class="eyebrow">Suggestions</p>
+      <ul class="suggestions" id="suggestions-list"></ul>
+    </div>
+
+    <hr class="hr">
+
+    <div class="result-footer">
+      <button type="button" class="btn btn-secondary" id="reset-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 1 3 6.7M3 12V6m0 6h6"></path></svg>
+        <span>Run another prediction</span>
+      </button>
+      <p class="disclaimer">This is a model estimate, not a medical diagnosis. If you're concerned, please see a doctor.</p>
+    </div>
+  </section>
+
+</div>
+<script src="/app.js"></script>
+</body>
 </html>
