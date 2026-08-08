@@ -13,6 +13,14 @@ pytest tests/test_main.py::test_predict_returns_a_known_label -v   # run a singl
 
 `pytest.ini` sets `pythonpath = .`, so `pytest` works from the repo root without any `PYTHONPATH` workaround — don't reintroduce one.
 
+### Deploy (Cloud Run)
+
+```bash
+gcloud run deploy sleep-disorder-predictor --source . --region us-central1 --allow-unauthenticated
+```
+
+Builds the `Dockerfile` and deploys it — no local Docker install needed, Cloud Build handles the image remotely. The `Dockerfile`'s `CMD` reads Cloud Run's injected `$PORT` (shell form, defaults to `8080` if unset); `main.py` itself doesn't need to know about `$PORT`, only the process that launches `uvicorn` does.
+
 On Windows, `uvicorn --reload` can print `WinError 10013` from its reloader/watcher process even when the underlying worker has already bound the port successfully — check `curl http://127.0.0.1:8000/` before assuming the server failed to start. If the port really is stuck, it's usually a previous `uvicorn` process left running; find and kill it before relaunching.
 
 ## Architecture
