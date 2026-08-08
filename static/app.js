@@ -1,16 +1,7 @@
-const state = {
-  gender: "Male",
-  age: 30,
-  sleepDuration: 7.0,
-  qualityOfSleep: 7,
-  physicalActivity: 45,
-  stressLevel: 5,
-  bmi: "Normal",
-  heartRate: 72,
-  dailySteps: 7000,
-  bpSystolic: 120,
-  bpDiastolic: 80,
-};
+// Seeded from the DOM once wireSegmented/wireRange/wireNumber run below, so that
+// values the browser restores across a soft reload (form controls, but not these
+// plain-text labels) are reflected here instead of silently reverting to defaults.
+const state = {};
 
 const RESULT_CONTENT = {
   None: {
@@ -59,6 +50,10 @@ function showScreen(name) {
 
 function wireSegmented(containerId, stateKey) {
   const container = document.getElementById(containerId);
+  const active = container.querySelector(".seg-opt.active");
+  if (active) {
+    state[stateKey] = active.dataset.value;
+  }
   container.querySelectorAll(".seg-opt").forEach((btn) => {
     btn.addEventListener("click", () => {
       state[stateKey] = btn.dataset.value;
@@ -70,6 +65,9 @@ function wireSegmented(containerId, stateKey) {
 function wireRange(inputId, labelId, stateKey, parse, format) {
   const input = document.getElementById(inputId);
   const label = document.getElementById(labelId);
+  const initial = parse(input.value);
+  state[stateKey] = initial;
+  label.textContent = format(initial);
   input.addEventListener("input", () => {
     const value = parse(input.value);
     state[stateKey] = value;
@@ -79,6 +77,7 @@ function wireRange(inputId, labelId, stateKey, parse, format) {
 
 function wireNumber(inputId, stateKey) {
   const input = document.getElementById(inputId);
+  state[stateKey] = parseInt(input.value, 10) || 0;
   input.addEventListener("input", () => {
     state[stateKey] = parseInt(input.value, 10) || 0;
   });
@@ -150,11 +149,14 @@ async function predict() {
         bp_diastolic: state.bpDiastolic,
       }),
     });
-    if (!response.ok) {
+    if (response.status === 422) {
+      renderError("Some of your values are out of range. Please check your entries and try again.");
+    } else if (!response.ok) {
       throw new Error("Server returned " + response.status);
+    } else {
+      const data = await response.json();
+      renderResult(data.result);
     }
-    const data = await response.json();
-    renderResult(data.result);
   } catch (err) {
     renderError("We couldn't reach the prediction service. Please try again.");
   }

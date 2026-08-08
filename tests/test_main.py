@@ -22,7 +22,7 @@ VALID_PAYLOAD = {
 def test_root_serves_index_html():
     response = client.get("/")
     assert response.status_code == 200
-    assert "placeholder" in response.text
+    assert 'id="form-screen"' in response.text
 
 
 def test_build_features_encodes_gender_and_bmi():
